@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Player</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 35px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 1200px;
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #1e3c72, #2a5298, #1e3c72);
+            background-size: 200% 100%;
+            animation: gradientMove 3s linear infinite;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 100% 0; }
+            100% { background-position: -100% 0; }
+        }
+
+        .logo {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 30px;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 20px rgba(30,60,114,0.2);
+        }
+
+        .logo i {
+            font-size: 2em;
+            color: white;
+        }
+
+        h1 {
+            color: #1e3c72;
+            text-align: center;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .description {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+            padding: 0 20px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin: 25px 0;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 2px solid #e1e1e1;
+            transition: all 0.3s ease;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: #1e3c72;
+            box-shadow: 0 8px 16px rgba(42,82,152,0.15);
+        }
+
+        input[type="url"] {
+            width: 100%;
+            padding: 18px 50px 18px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 12px;
+            background: transparent;
+            color: #333;
+            outline: none;
+        }
+
+        input[type="url"]::placeholder {
+            color: #999;
+            opacity: 0.8;
+        }
+
+        .paste-button {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #1e3c72;
+            cursor: pointer;
+            padding: 8px;
+            z-index: 2;
+            transition: all 0.3s ease;
+            border-radius: 50%;
+        }
+
+        .paste-button:hover {
+            background: rgba(30,60,114,0.1);
+        }
+
+        button.watch-btn {
+            padding: 18px 35px;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        button.watch-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+
+        button.watch-btn:hover::before {
+            left: 100%;
+        }
+
+        .video-wrapper {
+            margin-top: 30px;
+            border: 3px solid rgba(30,60,114,0.1);
+            transition: all 0.5s ease;
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            background: #000;
+            margin: 0 auto;
+        }
+
+        .video-wrapper:hover {
+            transform: scale(1.01);
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 15px;
+            transition: opacity 0.3s ease;
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            border-width: 3px;
+            border-style: solid;
+            border-color: #1e3c72 rgba(30,60,114,0.2) rgba(30,60,114,0.2);
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 14px;
+            display: none;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+            font-weight: 500;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, 20px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+
+        
+    @media (max-width: 600px) {
+        .video-wrapper {
+            padding-bottom: 65%;
+        }
+
+        .container {
+            width: 95%;
+            padding: 20px;
+        }
+
+        .input-group {
+            flex-direction: column;
+        }
+
+        .watch-btn {
+            width: 100%;
+        }
+    }
+
+@media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 25px;
+                margin: 10px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .description {
+                font-size: 0.9em;
+                padding: 0 10px;
+            }
+
+            .input-group {
+                flex-direction: column;
+                padding: 0 10px;
+                gap: 10px;
+            }
+
+            input[type="url"] {
+                padding: 12px 40px 12px 15px;
+                font-size: 14px;
+            }
+
+            button.watch-btn {
+                width: 100%;
+                justify-content: center;
+                padding: 15px 25px;
+                font-size: 14px;
+            }
+
+            .video-wrapper {
+                margin-top: 15px;
+            }
+
+            .features {
+                gap: 10px;
+            }
+
+            .feature-pill {
+                font-size: 0.8em;
+            }
+
+            .theme-toggle,
+            .history-toggle {
+                width: 35px;
+                height: 35px;
+                font-size: 1em;
+            }
+        }
+
+        
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+    }
+
+/* Dark mode styles */
+        body.dark-mode {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+        }
+
+        .dark-mode .container {
+            background: rgba(17, 24, 39, 0.95);
+            color: #e2e8f0;
+        }
+
+        .dark-mode h1 {
+            color: #e2e8f0;
+        }
+
+        .dark-mode .description {
+            color: #94a3b8;
+        }
+
+        .dark-mode input[type="url"] {
+            background: #1e293b;
+            border-color: #475569;
+            color: #e2e8f0;
+        }
+
+        .dark-mode .paste-button {
+            color: #94a3b8;
+        }
+
+        .dark-mode .input-wrapper {
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        .dark-mode .feature-pill {
+            background: rgba(255,255,255,0.1);
+            color: #e2e8f0;
+        }
+
+        /* Theme toggle button */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+            z-index: 1002;
+        }
+
+        .dark-mode .theme-toggle {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        /* History panel */
+        .history-panel {
+            position: fixed;
+            left: -300px;
+            top: 0;
+            width: 300px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(0,0,0,0.1);
+            transition: left 0.3s ease;
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .history-panel h3 {
+            font-size: 1.2em;
+            color: #1e3c72;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(30,60,114,0.1);
+        }
+
+        .history-panel.active {
+            left: 0;
+        }
+
+        .history-toggle {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            z-index: 1002;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2em;
+        }
+
+        .history-item {
+            background: rgba(255,255,255,0.5);
+            margin-bottom: 10px;
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            background: #f1f5f9;
+        }
+
+        .dark-mode .history-item {
+            border-bottom-color: #475569;
+        }
+
+        .dark-mode .history-item:hover {
+            background: #2d3748;
+        }
+
+        /* Feature Pills */
+        .features {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .feature-pill {
+            background: rgba(30,60,114,0.1);
+            color: #1e3c72;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.9em;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .feature-pill:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .feature-pill i {
+            font-size: 0.9em;
+        }
+
+        /* Share button */
+        .share-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .share-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+
+        /* New Professional Enhancements */
+        .container {
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Enhanced Input Styles */
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .url-preview {
+            position: absolute;
+            bottom: -22px;
+            left: 5px;
+            font-size: 0.8em;
+            color: #666;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            padding: 2px 10px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 4px;
+            backdrop-filter: blur(5px);
+        }
+
+        .dark-mode .url-preview {
+            background: rgba(0,0,0,0.5);
+            color: #94a3b8;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            width: 0%;
+            background: linear-gradient(90deg, #1e3c72, #2a5298);
+            transition: width 0.3s ease;
+        }
+
+        /* Stats Panel */
+        .stats-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            display: none;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .dark-mode .stats-panel {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+        }
+
+        /* Enhanced Loading Animation */
+        .loading-wrapper {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .loading-text {
+            margin-top: 15px;
+            color: #1e3c72;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        /* Enhanced Button Styles */
+        button {
+            -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+        }
+
+        /* Theme and History Toggle Buttons */
+        .theme-toggle,
+        .history-toggle {
+            position: fixed;
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+            z-index: 1002;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .theme-toggle:hover,
+        .history-toggle:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .theme-toggle:active,
+        .history-toggle:active {
+            transform: scale(0.95);
+        }
+
+        /* Paste Button */
+        .paste-button {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(30,60,114,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .paste-button:hover {
+            background: rgba(30,60,114,0.2);
+            transform: scale(1.1);
+        }
+
+        .paste-button:active {
+            transform: scale(0.95);
+        }
+
+        /* Watch Button */
+        .watch-btn {
+            min-width: 120px;
+            height: 50px;
+            padding: 0 30px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .watch-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .watch-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        /* Feature Pills */
+        .feature-pill {
+            padding: 10px 20px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(30,60,114,0.1);
+        }
+
+        .feature-pill:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            background: rgba(30,60,114,0.15);
+        }
+
+        .feature-pill:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        /* Mobile Optimizations */
+        
+    @media (max-width: 600px) {
+        .video-wrapper {
+            padding-bottom: 65%;
+        }
+
+        .container {
+            width: 95%;
+            padding: 20px;
+        }
+
+        .input-group {
+            flex-direction: column;
+        }
+
+        .watch-btn {
+            width: 100%;
+        }
+    }
+
+@media (max-width: 768px) {
+            .theme-toggle,
+            .history-toggle {
+                width: 40px;
+                height: 40px;
+                font-size: 1.1em;
+            }
+
+            .paste-button {
+                width: 35px;
+                height: 35px;
+                font-size: 0.9em;
+            }
+
+            .watch-btn {
+                width: 100%;
+                height: 45px;
+                padding: 0 20px;
+                font-size: 0.9em;
+            }
+
+            .feature-pill {
+                padding: 8px 16px;
+                font-size: 0.85em;
+            }
+        }
+
+        /* Touch Device Optimizations */
+        @media (hover: none) {
+            .theme-toggle,
+            .history-toggle,
+            .paste-button,
+            .watch-btn,
+            .feature-pill {
+                transition: transform 0.2s ease;
+            }
+
+            .theme-toggle:active,
+            .history-toggle:active,
+            .paste-button:active,
+            .watch-btn:active,
+            .feature-pill:active {
+                transform: scale(0.95);
+            }
+        }
+
+        /* Dark Mode Button Styles */
+        .dark-mode .paste-button {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .dark-mode .paste-button:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .dark-mode .feature-pill {
+            border-color: rgba(255,255,255,0.1);
+        }
+
+        .dark-mode .feature-pill:hover {
+            background: rgba(255,255,255,0.15);
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+        <i class="fas fa-moon"></i>
+    </button>
+    
+    <button class="history-toggle" onclick="toggleHistory()" title="View history">
+        <i class="fas fa-history"></i>
+    </button>
+
+    <div class="history-panel">
+        <h3>History</h3>
+        <div id="historyList"></div>
+    </div>
+
+    <div class="container">
+        <div class="logo">
+            <i class="fas fa-play-circle"></i>
+        </div>
+        <h1>Video Player</h1>
+        <p class="description">Professional video player for your media content</p>
+        
+        <div class="features">
+            <div class="feature-pill">
+                <i class="fas fa-history"></i>
+                Watch History
+            </div>
+            <div class="feature-pill">
+                <i class="fas fa-share-alt"></i>
+                Easy Sharing
+            </div>
+            <div class="feature-pill">
+                <i class="fas fa-moon"></i>
+                Dark Mode
+            </div>
+        </div>
+
+        <div class="input-group">
+            <div class="input-wrapper">
+                <input type="url" id="urlInput" placeholder="Paste your video URL here..." required autocomplete="off" spellcheck="false">
+                <button class="paste-button" onclick="pasteFromClipboard()" title="Paste from clipboard">
+                    <i class="far fa-clipboard"></i>
+                </button>
+            </div>
+            <button class="watch-btn" onclick="loadVideo()">
+                <i class="fas fa-play"></i>
+                Watch Now
+            </button>
+        </div>
+        <div class="video-wrapper">
+            <div class="loading-wrapper">
+                <div class="loading" id="loading"></div>
+                <div class="loading-text">Loading your video...</div>
+            </div>
+            <div class="progress-bar" id="progressBar"></div>
+            <div class="stats-panel" id="statsPanel">
+                Loading time: <span id="loadTime">0</span>s<br>
+                Quality: <span id="videoQuality">Auto</span>
+            </div>
+            <iframe id="videoContainer" frameborder="0" allowfullscreen></iframe>
+        </div>
+    </div>
+    <div class="toast" id="toast"></div>
+
+    <script>
+        
+const blockedPatterns = [
+    /telegram\.im\/TeraboxDownloader_5Bot/i,
+    /t\.me\/TeraboxDownloader_5Bot/i
+];
+
+            /telegram\.im\/@TeraboxDownloader_5Bot/i,
+            /t\.me\/@TeraboxDownloader_5Bot/i,
+            /telegram\.im.*TeraboxDownloader/i,
+            /t\.me.*TeraboxDownloader/i,
+            /telegram\.im/i,  // Block all telegram.im URLs
+            /t\.me/i,        // Block all t.me URLs
+            /teraboxdownloader/i  // Block any URL containing teraboxdownloader
+        ];
+
+        function isBlockedURL(url) {
+            return blockedPatterns.some(pattern => pattern.test(url));
+        }
+
+        function showToast(message, duration = 3000) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+            
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, duration);
+        }
+
+        async function pasteFromClipboard() {
+            try {
+                const text = await navigator.clipboard.readText();
+                const input = document.getElementById('urlInput');
+                input.value = text;
+                input.focus();
+                showToast('URL pasted successfully!');
+                
+                // Remove any existing preview
+                const existingPreview = document.querySelector('.url-preview');
+                if (existingPreview) {
+                    existingPreview.remove();
+                }
+                
+                // Add new preview if URL is valid
+                try {
+                    const url = new URL(text);
+                    updateUrlPreview(text);
+                } catch (e) {
+                    // Invalid URL, don't show preview
+                }
+            } catch (err) {
+                showToast('Unable to paste. Please paste manually.');
+            }
+        }
+
+        
+        function loadVideo() {
+            const userInput = document.getElementById('urlInput').value.trim();
+            try {
+                new URL(userInput);  // Validates the URL
+            } catch (err) {
+                showToast('Invalid URL! Please enter a proper link.');
+                return;
+            }
+            
+            if (isBlockedURL(userInput)) {
+                showToast('This URL is not allowed');
+                return;
+            }
+
+            startLoading();
+            const videoFrame = document.getElementById('videoContainer');
+            videoFrame.src = 'https://opabhik.serv00.net/Watch.php?url=' + encodeURIComponent(userInput);
+            videoFrame.style.opacity = '1';
+
+            videoFrame.onload = function() {
+                stopLoading();
+                showToast('Video loaded successfully!');
+                updateUrlPreview(userInput);
+                addToHistory(userInput);
+                updateHistoryPanel(); // Ensure history updates immediately
+                scrollToVideo();
+            };
+
+            videoFrame.onerror = function() {
+                stopLoading();
+                showToast('Error loading video. Please check the URL and try again.');
+            };
+        }
+
+            const userInput = document.getElementById('urlInput').value;
+            
+            if (!userInput) {
+                showToast('Please enter a valid URL');
+                return;
+            }
+
+            if (isBlockedURL(userInput)) {
+                showToast('This URL is not allowed');
+                return;
+            }
+
+            startLoading();
+            
+            const baseUrl = 'https://opabhik.serv00.net/Watch.php?url=';
+            const finalUrl = baseUrl + encodeURIComponent(userInput);
+            
+            const videoFrame = document.getElementById('videoContainer');
+            videoFrame.style.opacity = '0';
+            
+            // Create a new iframe to avoid caching issues
+            const newFrame = document.createElement('iframe');
+            newFrame.id = 'videoContainer';
+            newFrame.frameborder = '0';
+            newFrame.allowfullscreen = true;
+            newFrame.src = finalUrl;
+
+            // Replace old iframe with new one
+            videoFrame.parentNode.replaceChild(newFrame, videoFrame);
+
+            // Add load event listener to new iframe
+            newFrame.onload = function() {
+                stopLoading();
+                this.style.opacity = '1';
+                showToast('Video loaded successfully!');
+                updateUrlPreview(userInput);
+                addToHistory(userInput);
+                scrollToVideo();
+            };
+
+            newFrame.onerror = function() {
+                stopLoading();
+                showToast('Error loading video. Please check the URL and try again.');
+            };
+
+            // Monitor for redirects
+            newFrame.addEventListener('load', function() {
+                try {
+                    if (isBlockedURL(this.contentWindow.location.href)) {
+                        this.src = 'about:blank';
+                        showToast('Blocked redirect detected');
+                    }
+                } catch (e) {
+                    // Handle cross-origin errors silently
+                }
+            });
+        }
+
+        // Update the stopLoading function to be more reliable
+        function stopLoading() {
+            const loadingWrapper = document.querySelector('.loading-wrapper');
+            if (loadingWrapper) {
+                loadingWrapper.style.display = 'none';
+            }
+            
+            const loadTime = ((performance.now() - loadStartTime) / 1000).toFixed(1);
+            const loadTimeElement = document.getElementById('loadTime');
+            if (loadTimeElement) {
+                loadTimeElement.textContent = loadTime;
+            }
+            
+            updateProgress(100);
+            
+            const statsPanel = document.getElementById('statsPanel');
+            if (statsPanel) {
+                statsPanel.style.display = 'block';
+            }
+        }
+
+        // Add error handling for iframe loading
+        window.addEventListener('message', function(event) {
+            if (event.data === 'videoError') {
+                stopLoading();
+                showToast('Error loading video. Please check the URL and try again.');
+            }
+        });
+
+        // Theme toggle functionality
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const icon = document.querySelector('.theme-toggle i');
+            if (document.body.classList.contains('dark-mode')) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        }
+
+        // History functionality
+        function toggleHistory() {
+            const historyPanel = document.querySelector('.history-panel');
+            historyPanel.classList.toggle('active');
+            updateHistoryPanel();
+        }
+
+        function addToHistory(url) {
+            let history = JSON.parse(localStorage.getItem('videoHistory') || '[]');
+            history.unshift({
+                url: url,
+                timestamp: new Date().toISOString()
+            });
+            history = history.slice(0, 10); // Keep only last 10 items
+            localStorage.setItem('videoHistory', JSON.stringify(history));
+            updateHistoryPanel();
+        }
+
+        function updateHistoryPanel() {
+            const history = JSON.parse(localStorage.getItem('videoHistory') || '[]');
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = history.map(item => `
+                <div class="history-item" onclick="loadHistoryItem('${item.url}')">
+                    <div>${new URL(item.url).hostname}</div>
+                    <small>${new Date(item.timestamp).toLocaleString()}</small>
+                </div>
+            `).join('');
+        }
+
+        function loadHistoryItem(url) {
+            document.getElementById('urlInput').value = url;
+            loadVideo();
+            toggleHistory();
+        }
+
+        // Share functionality
+        async function shareVideo() {
+            const url = document.getElementById('urlInput').value;
+            try {
+                await navigator.share({
+                    title: 'Watch Video',
+                    url: url
+                });
+                showToast('Shared successfully!');
+            } catch (err) {
+                showToast('Unable to share');
+            }
+        }
+
+        // Add smooth scroll to video
+        function scrollToVideo() {
+            const videoWrapper = document.querySelector('.video-wrapper');
+            videoWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // Progress Bar
+        let loadStartTime;
+        function updateProgress(progress) {
+            document.getElementById('progressBar').style.width = `${progress}%`;
+        }
+
+        // Enhanced Loading
+        function startLoading() {
+            loadStartTime = performance.now();
+            document.querySelector('.loading-wrapper').style.display = 'block';
+            updateProgress(0);
+        }
+
+        // URL Preview
+        function updateUrlPreview(url) {
+            // Remove any existing preview
+            const existingPreview = document.querySelector('.url-preview');
+            if (existingPreview) {
+                existingPreview.remove();
+            }
+
+            try {
+                const urlObj = new URL(url);
+                const preview = document.createElement('div');
+                preview.className = 'url-preview';
+                preview.textContent = urlObj.hostname;
+                document.querySelector('.input-wrapper').appendChild(preview);
+            } catch (e) {
+                // Invalid URL, don't show preview
+            }
+        }
+
+        // Add input event listener for real-time preview
+        document.getElementById('urlInput').addEventListener('input', function(e) {
+            if (e.target.value) {
+                try {
+                    new URL(e.target.value); // Check if valid URL
+                    updateUrlPreview(e.target.value);
+                } catch (err) {
+                    // Invalid URL, remove preview
+                    const existingPreview = document.querySelector('.url-preview');
+                    if (existingPreview) {
+                        existingPreview.remove();
+                    }
+                }
+            } else {
+                // Empty input, remove preview
+                const existingPreview = document.querySelector('.url-preview');
+                if (existingPreview) {
+                    existingPreview.remove();
+                }
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Apply saved theme
+            if (localStorage.getItem('darkMode') === 'true') {
+                toggleTheme();
+            }
+
+            // Update history panel
+            updateHistoryPanel();
+        });
+
+        // Add touch feedback for buttons
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('touchstart', function(e) {
+                this.style.transform = 'scale(0.95)';
+            }, { passive: true });
+
+            button.addEventListener('touchend', function(e) {
+                this.style.transform = 'scale(1)';
+            }, { passive: true });
+        });
+
+        // Improve button click handling
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Debounce button clicks
+        const debouncedLoadVideo = debounce(() => loadVideo(), 300);
+        const debouncedToggleTheme = debounce(() => toggleTheme(), 300);
+        const debouncedToggleHistory = debounce(() => toggleHistory(), 300);
+        const debouncedPasteFromClipboard = debounce(() => pasteFromClipboard(), 300);
+
+        // Update button click handlers
+        document.querySelector('.watch-btn').onclick = debouncedLoadVideo;
+        document.querySelector('.theme-toggle').onclick = debouncedToggleTheme;
+        document.querySelector('.history-toggle').onclick = debouncedToggleHistory;
+        document.querySelector('.paste-button').onclick = debouncedPasteFromClipboard;
+    </script>
+</body>
+</html>
